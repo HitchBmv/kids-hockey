@@ -13,10 +13,20 @@ import { AuthService } from "../auth/auth.service";
   imports: [CommonModule, RouterOutlet, MenubarModule, ButtonModule],
   template: `
     <p-menubar [model]="items">
+      <ng-template pTemplate="start">
+        <img
+          src="/waterloo-ducks-small.jpg"
+          alt="Logo"
+          height="48"
+          class="mr-2"
+        />
+      </ng-template>
+
       <ng-template pTemplate="end">
         <button pButton type="button" label="Logout" (click)="logout()"></button>
       </ng-template>
     </p-menubar>
+
 
     <div class="p-3">
       <router-outlet></router-outlet>
@@ -25,8 +35,9 @@ import { AuthService } from "../auth/auth.service";
 })
 export class LayoutComponent {
   items = [
-    { label: "Matchs", routerLink: "/matches" },
+    { label: "Matchs", routerLink: "/matchs" },
     { label: "Dashboard", routerLink: "/dashboard" },
+    { label: "Line-Up", routerLink: "/lineup" },
   ];
 
   constructor(private readonly auth: AuthService, private readonly router: Router) {}

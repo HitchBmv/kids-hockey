@@ -22,6 +22,7 @@ type DashboardRow = {
   status: "yes" | "no" | "maybe";
   bringOranges: boolean;
   referee: boolean;
+  goalkeeper: boolean;
 };
 
 @Component({
@@ -46,7 +47,8 @@ type DashboardRow = {
           <th>Enfant</th>
           <th>Statut</th>
           <th>Je peux apporter des oranges</th>
-          <th>Je peux arbitrer le match</th>
+          <th>Je peux arbitrer</th>
+          <th>Ok pour jouer au goal?</th>
         </tr>
       </ng-template>
 
@@ -80,6 +82,13 @@ type DashboardRow = {
             <p-checkbox
               [binary]="true"
               [ngModel]="r.referee"
+              [disabled]="true">
+            </p-checkbox>
+          </td>
+          <td class="text-center">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="r.goalkeeper"
               [disabled]="true">
             </p-checkbox>
           </td>
@@ -142,10 +151,11 @@ export class DashboardComponent implements OnInit {
             opponent: m.opponent,
             isHome: m.isHome,
 
-            childName: r.childName ?? "",
+            childName: this.normalizeChildName(r.childName),
             status: r.status,
             bringOranges: m.isHome ? !!r.bringOranges : false,
             referee: m.isHome ? !!r.referee : false,
+            goalkeeper: r.goalkeeper,
           });
         }
       }
@@ -161,5 +171,19 @@ export class DashboardComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+
+  private normalizeChildName(value: any): string {
+  if (!value) return "";
+
+  if (typeof value === "string") return value;
+
+  if (typeof value === "object") {
+    const first = value.firstName ?? "";
+    const last = value.lastName ?? "";
+    return `${first} ${last}`.trim();
+  }
+
+  return String(value);
+}
 }
 

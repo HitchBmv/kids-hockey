@@ -5,20 +5,23 @@ import { Match } from "./models";
 
 @Injectable({ providedIn: "root" })
 export class MatchesService {
+
   async getMatchesByTeam(teamId: string): Promise<Match[]> {
+    const now = Timestamp.fromDate(new Date());
     const q = query(
-      collection(db, "matches"),
-      where("teamId", "==", teamId),
-      orderBy("dateTime", "asc")
-    );
+    collection(db, "matches"),
+    where("teamId", "==", teamId),
+    where("dateTime", ">=", now),
+    orderBy("dateTime", "asc")
+  );
+
 
     const snap = await getDocs(q);
     return snap.docs.map((d) => {
       const data = d.data() as any;
 
       // Si tu stockes dateTime en Firestore Timestamp:
-      const dt =
-        data.dateTime instanceof Timestamp ? data.dateTime.toMillis() : (data.dateTime ?? 0);
+      const dt = data.dateTime instanceof Timestamp ? data.dateTime.toMillis() : (data.dateTime ?? 0);
 
       return {
         id: d.id,
@@ -31,8 +34,17 @@ export class MatchesService {
     });
   }
 
-  async getMatch(matchId: string): Promise<Match | null> {
-    // Optionnel si tu veux lire un match direct : à implémenter si besoin
-    return null;
+  async getAllLineUpMatches(): Promise<Match[]> {
+    const ref = collection(db, "matches");
+    const snap = await getDocs(ref);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Match));
   }
+
+  async getLineUpMatchesByTeam(teamId: string): Promise<Match[]> {
+    const ref = collection(db, "matches");
+    const q = query(ref, where("teamId", "==", teamId));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Match));
+  }
+
 }

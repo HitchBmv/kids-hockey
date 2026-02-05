@@ -35,6 +35,9 @@ import { Match, PresenceStatus } from "../../data/models";
         <div class="opacity-80">
           {{ match.location }} • {{ match.isHome ? "Domicile" : "Extérieur" }}
         </div>
+        <div class="opacity-80">
+          Rendez-vous à {{ getTimeMinus30(match.dateTime) | date:"HH:mm" }}
+        </div>
 
         <div>
           <label class="block mb-2 font-medium">Présence</label>
@@ -46,16 +49,25 @@ import { Match, PresenceStatus } from "../../data/models";
           </p-selectButton>
         </div>
 
-        <div *ngIf="match.isHome" class="mt-2">
-          <div class="flex align-items-center gap-2 mb-2">
-            <p-checkbox [(ngModel)]="bringOranges" binary="true"></p-checkbox>
-            <label>OK pour amener des oranges</label>
+        @if (match.isHome) {
+          <div class="mt-2">
+            <div class="flex align-items-center gap-2 mb-2">
+              <p-checkbox [(ngModel)]="bringOranges" binary="true"></p-checkbox>
+              <label>OK pour amener des oranges</label>
+            </div>
+            <div class="flex align-items-center gap-2">
+              <p-checkbox [(ngModel)]="referee" binary="true"></p-checkbox>
+              <label>OK pour arbitrer</label>
+            </div>
           </div>
+        }
+        <div class="mt-2">
           <div class="flex align-items-center gap-2">
-            <p-checkbox [(ngModel)]="referee" binary="true"></p-checkbox>
-            <label>OK pour arbitrer</label>
+            <p-checkbox [(ngModel)]="goalkeeper" binary="true"></p-checkbox>
+            <label>OK pour jouer gardienne</label>
           </div>
         </div>
+
 
         <button pButton label="Enregistrer" (click)="save()" [disabled]="saving"></button>
 
@@ -75,6 +87,7 @@ export class MatchDetailComponent implements OnInit {
   status: PresenceStatus = "maybe";
   bringOranges = false;
   referee = false;
+  goalkeeper = false;
 
   saving = false;
   saved = false;
@@ -124,6 +137,7 @@ export class MatchDetailComponent implements OnInit {
         this.status = existing.status;
         this.bringOranges = existing.bringOranges;
         this.referee = existing.referee;
+        this.goalkeeper = existing.goalkeeper;
       }
     } catch (e: any) {
       this.error = e?.message ?? "Erreur chargement match";
@@ -156,6 +170,8 @@ export class MatchDetailComponent implements OnInit {
         status: this.status,
         bringOranges: isHome ? this.bringOranges : false,
         referee: isHome ? this.referee : false,
+        goalkeeper: this.goalkeeper,
+        lineup: this.goalkeeper,
         updatedAt: Date.now(),
       });
 
@@ -167,4 +183,11 @@ export class MatchDetailComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+
+  getTimeMinus30(timestamp: number): Date {
+    const d = new Date(timestamp);
+    d.setMinutes(d.getMinutes() - 30);
+    return d;
+  }
+
 }

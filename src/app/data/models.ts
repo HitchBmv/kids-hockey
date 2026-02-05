@@ -23,5 +23,7 @@ export interface MatchResponse {
   status: PresenceStatus;
   bringOranges: boolean;
   referee: boolean;
+  goalkeeper: boolean;
+  lineup: boolean;
   updatedAt: number;
 }

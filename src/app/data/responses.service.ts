@@ -31,6 +31,8 @@ export class ResponsesService {
       status: data.status ?? "maybe",
       bringOranges: !!data.bringOranges,
       referee: !!data.referee,
+      goalkeeper: !!data.goalkeeper,
+      lineup: !!data.lineup,
       updatedAt: updated,
     };
   }
@@ -55,6 +57,8 @@ export class ResponsesService {
         status: data.status ?? "maybe",
         bringOranges: !!data.bringOranges,
         referee: !!data.referee,
+        goalkeeper: !!data.goalkeeper,
+        lineup: !!data.lineup,
         updatedAt: updated,
       } satisfies MatchResponse;
     });

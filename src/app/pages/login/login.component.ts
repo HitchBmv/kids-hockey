@@ -209,7 +209,7 @@ import { AppUser } from "../../data/models";
   <div class="flex justify-content-center">
     <div class="left-side">
       <img  src="/waterloo-ducks-small.jpg" alt="Logo">
-      <h3>Bienvenue dans l’outil des Hockey Kids ! Votre espace pour suivre, organiser et vivre la saison avec l’équipe !</h3>
+      <h3>Bienvenue dans Wadu Kids! Votre espace pour suivre, organiser et vivre la saison avec l’équipe !</h3>
       <p><i>Ducks fly together 🦆</i></p>
     </div>
 
@@ -241,7 +241,7 @@ import { AppUser } from "../../data/models";
       </div>
     </div>
   </div>
-</main>
+  </main>
     <div class="flex justify-content-center">
       <p-card header="Connexion" styleClass="w-full md:w-30rem">
         <p-message *ngIf="error" severity="error" [text]="error"></p-message>
@@ -286,7 +286,14 @@ import { AppUser } from "../../data/models";
           <button pButton label="Créer un compte" severity="secondary" (click)="onRegister()" [disabled]="busy"></button>
         </div>
       </p-card>
+
     </div>
+    <footer class="app-footer">
+      © {{ year }} Copyright
+      <a href="https://gettalent.be" target="_blank" rel="noopener noreferrer">
+        gettalent.be</a>
+      All Rights Reserved
+    </footer>
   `,
 })
 export class LoginComponent {
@@ -311,6 +318,8 @@ export class LoginComponent {
 
   filteredTeams: string[] = [];
 
+  year = new Date().getFullYear();
+
   filterTeams(event: { query: string }) {
     const q = (event.query ?? "").toLowerCase().trim();
     this.filteredTeams = this.teamOptions.filter(t =>
@@ -330,7 +339,7 @@ export class LoginComponent {
     this.busy = true;
     try {
       await this.auth.login(this.email, this.password);
-      this.router.navigateByUrl("/matches");
+      this.router.navigateByUrl("/matchs");
     } catch (e: any) {
       this.error = e?.message ?? "Erreur login";
       this.cdr.detectChanges();
@@ -361,7 +370,7 @@ export class LoginComponent {
       };
 
       await this.users.upsertUser(user);
-      this.router.navigateByUrl("/matches");
+      this.router.navigateByUrl("/matchs");
     } catch (e: any) {
       this.error = this.formatError(e);
       this.cdr.detectChanges();
