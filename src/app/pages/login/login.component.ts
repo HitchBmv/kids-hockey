@@ -271,16 +271,41 @@ import { AppUser } from "../../data/models";
               [(ngModel)]="teamId"
               [suggestions]="filteredTeams"
               (completeMethod)="filterTeams($event)"
-              placeholder="ex: U9-Girls-A"
-              [forceSelection]="false"
+              (onSelect)="onTeamSelected($event.value)"
+              placeholder="Sélectionne une équipe"
               [dropdown]="true">
             </p-autoComplete>
 
           </div>
 
           <div class="flex flex-column gap-2">
-            <label>Nom enfant</label>
-            <input pInputText [(ngModel)]="childName" placeholder="ex: Cris" />
+            <label>Choisir une joueuse</label>
+
+           <p-autoComplete
+              [(ngModel)]="selectedPlayer"
+              [suggestions]="filteredPlayers"
+              (completeMethod)="filterPlayers($event)"
+              field="Prenom"
+              optionLabel="fullName"
+              [dropdown]="true"
+              placeholder="Sélectionne une joueuse"
+              [forceSelection]="true">
+
+              <!-- Item dans la liste -->
+              <ng-template let-p pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <span>{{ p.fullName }}</span>
+                </div>
+              </ng-template>
+
+              <!-- Item sélectionné -->
+              <ng-template let-p pTemplate="selectedItem">
+                <span>{{ p.fullName }}</span>
+              </ng-template>
+
+            </p-autoComplete>
+
+
           </div>
 
           <button pButton label="Créer un compte" severity="secondary" (click)="onRegister()" [disabled]="busy"></button>
@@ -306,14 +331,15 @@ export class LoginComponent {
   error = "";
 
   teamOptions = [
-    "U9-Girls-A",
-    "U9-Girls-B",
-    "U10-Girls-A",
-    "U10-Girls-B",
-    "U12-Girls-A",
-    "U12-Girls-B",
-    "U14-Girls-A",
-    "U14-Girls-B",
+    // "U9-Girls-W1",
+    // "U9-Girls-W2",
+    "U9-Girls-W3",
+    // "U10-Girls-W1",
+    // "U10-Girls-W2",
+    // "U12-Girls-W1",
+    // "U12-Girls-W2",
+    // "U14-Girls-W1",
+    // "U14-Girls-W2",
   ];
 
   filteredTeams: string[] = [];
@@ -325,6 +351,22 @@ export class LoginComponent {
     this.filteredTeams = this.teamOptions.filter(t =>
       t.toLowerCase().includes(q)
     );
+  }
+  players: any[] = [];
+  filteredPlayers: any[] = [];
+  selectedPlayer: any = null;
+
+  filterPlayers(event: { query: string }) {
+    const q = (event.query ?? "").toLowerCase();
+
+    this.filteredPlayers = this.players.filter(p =>
+      `${p.Prenom} ${p.Nom}`.toLowerCase().includes(q)
+    );
+  }
+
+  async onTeamSelected(teamId: string) {
+    this.players = await this.users.getPlayersByTeam(teamId);
+    this.filteredPlayers = [...this.players];
   }
 
   constructor(
@@ -364,7 +406,7 @@ export class LoginComponent {
       const user: AppUser = {
         uid,
         email: this.email,
-        teamId: this.teamId || "U9-Girls",
+        teamId: this.teamId || "U9-Girls-W",
         childName: this.childName || "Enfant",
         createdAt: Date.now(),
       };
