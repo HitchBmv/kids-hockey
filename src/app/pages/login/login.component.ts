@@ -16,6 +16,9 @@ import { AuthService } from "../../auth/auth.service";
 import { UsersService } from "../../data/users.service";
 import { AppUser } from "../../data/models";
 
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+
 @Component({
   standalone: true,
   imports: [
@@ -365,6 +368,15 @@ export class LoginComponent {
   }
 
   async onTeamSelected(teamId: string) {
+      await new Promise((resolve) => {
+      const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+          unsubscribe();
+          resolve(user);
+        }
+      });
+    });
+
     this.players = await this.users.getPlayersByTeam(teamId);
     this.filteredPlayers = [...this.players];
   }

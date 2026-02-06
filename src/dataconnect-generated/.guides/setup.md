@@ -37,7 +37,7 @@ import { provideQueryClient, QueryClient } from '@tanstack/angular-query-experim
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideFirebaseApp(() => initializeApp({ ... /* your config here. To generate this, you can use the `firebase_sdk_config` MCP tool */ })),
+    (() => initializeApp({ ... /* your config here. To generate this, you can use the `firebase_sdk_config` MCP tool */ })),
     provideQueryClient(new QueryClient()),
     provideDataConnect(() => getDataConnect(connectorConfig))
     ...

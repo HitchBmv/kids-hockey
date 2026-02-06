@@ -10,7 +10,7 @@ import { auth } from "../firebase";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-  private _user = signal<User | null>(null);
+  private readonly _user = signal<User | null>(null);
   user = computed(() => this._user());
   uid = computed(() => this._user()?.uid ?? null);
   isLoggedIn = computed(() => !!this._user());
