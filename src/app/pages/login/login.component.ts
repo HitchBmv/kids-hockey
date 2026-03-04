@@ -261,6 +261,7 @@ import 'firebase/compat/auth';
           </div>
 
           <button pButton label="Se connecter" (click)="onLogin()" [disabled]="busy"></button>
+          <button pButton label="Continuer en invité" severity="info" (click)="continueAsGuest()"></button>
 
           <p-divider></p-divider>
 
@@ -368,6 +369,12 @@ export class LoginComponent {
   }
 
   async onTeamSelected(teamId: string) {
+    this.players = this.users.getPlayersByTeam(teamId);
+    this.filteredPlayers = [...this.players];
+  }
+  async onDatabaseTeamSelected(teamId: string) {
+      console.log(this.users);
+
       await new Promise((resolve) => {
       const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
         if (user) {
@@ -376,6 +383,8 @@ export class LoginComponent {
         }
       });
     });
+
+
 
     this.players = await this.users.getPlayersByTeam(teamId);
     this.filteredPlayers = [...this.players];
@@ -402,6 +411,10 @@ export class LoginComponent {
     }
   }
 
+  continueAsGuest() {
+    this.router.navigateByUrl('/dashboard-public');
+  }
+
   async onRegister() {
 
     if (!this.teamId?.trim()) {
@@ -417,9 +430,10 @@ export class LoginComponent {
 
       const user: AppUser = {
         uid,
+        admin: false,
         email: this.email,
         teamId: this.teamId || "U9-Girls-W",
-        childName: this.childName || "Enfant",
+        childName: this.selectedPlayer.fullName || "Enfant",
         createdAt: Date.now(),
       };
 

@@ -9,7 +9,7 @@ import { LayoutComponent } from "./shared/layout.component";
 
 export const routes: Routes = [
   { path: "login", component: LoginComponent },
-
+  { path: 'dashboard-public', component: DashboardComponent },
   {
     path: "",
     component: LayoutComponent,

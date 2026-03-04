@@ -2,6 +2,7 @@ export type PresenceStatus = "yes" | "no" | "maybe";
 
 export interface AppUser {
   uid: string;
+  admin:boolean;
   email: string;
   teamId: string;      // ex: "U14-Girls-A"
   childName: string;   // MVP: un enfant

@@ -1,14 +1,16 @@
 import { Injectable } from "@angular/core";
 import {
+  setDoc,
   doc,
   getDoc,
-  setDoc,
   collection,
   getDocs,
   Timestamp,
 } from "firebase/firestore";
+
 import { db } from "../firebase";
 import { MatchResponse } from "./models";
+import { PLAYERS } from "./users.service";
 
 @Injectable({ providedIn: "root" })
 export class ResponsesService {
@@ -38,9 +40,21 @@ export class ResponsesService {
   }
 
   async saveMyResponse(matchId: string, uid: string, payload: Omit<MatchResponse, "uid">) {
-    const ref = this.responseDoc(matchId, uid);
-    await setDoc(ref, { uid, ...payload }, { merge: true });
+    // Vérifier si l'UID existe dans la liste PLAYERS
+    const player = PLAYERS.find(p => p.uid === uid);
+    if (player){
+      const ref = this.responseDoc(matchId, uid);
+      await setDoc(ref, { uid, ...payload }, { merge: true });
+    }
   }
+
+  // private responsesCollection(matchId: string) {
+  //   return collection(db, `matches/${matchId}/responses`);
+  // }
+  // async saveMyResponse(matchId: string, uid: string, payload: Omit<MatchResponse, "uid">) {
+  //   const col = this.responsesCollection(matchId); // matches/{matchId}/responses
+  //   await addDoc(col, { uid, ...payload, createdAt: Date.now() });
+  // }
 
   async getAllResponses(matchId: string): Promise<MatchResponse[]> {
     const col = collection(db, "matches", matchId, "responses");

@@ -2,10 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
 
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { CheckboxModule } from "primeng/checkbox";
-import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 
 import { AuthService } from "../../auth/auth.service";
@@ -17,6 +18,7 @@ import { Match, PresenceStatus } from "../../data/models";
 @Component({
   standalone: true,
   imports: [
+    AutoCompleteModule,
     CommonModule,
     FormsModule,
     CardModule,
@@ -38,6 +40,32 @@ import { Match, PresenceStatus } from "../../data/models";
         <div class="opacity-80">
           Rendez-vous à {{ getTimeMinus30(match.dateTime) | date:"HH:mm" }}
         </div>
+        @if (isAdmin){
+        <div>
+           <p-autoComplete
+              [(ngModel)]="selectedPlayer"
+              [suggestions]="filteredPlayers"
+              (completeMethod)="filterPlayers($event)"
+              field="Prenom"
+              optionLabel="fullName"
+              [dropdown]="true"
+              placeholder="Sélectionne une joueuse"
+              [forceSelection]="true">
+
+              <!-- Item dans la liste -->
+              <ng-template let-p pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <span>{{ p.fullName }}</span>
+                </div>
+              </ng-template>
+
+              <!-- Item sélectionné -->
+              <ng-template let-p pTemplate="selectedItem">
+                <span>{{ p.fullName }}</span>
+              </ng-template>
+            </p-autoComplete>
+          </div>
+        }
 
         <div>
           <label class="block mb-2 font-medium">Présence</label>
@@ -115,6 +143,8 @@ export class MatchDetailComponent implements OnInit {
     this.LoadData();
   }
 
+  isAdmin : boolean = false;
+
   private async LoadData(){
     this.matchId = this.route.snapshot.paramMap.get("id") ?? "";
     this.error = "";
@@ -125,6 +155,11 @@ export class MatchDetailComponent implements OnInit {
 
       const user = await this.users.getUser(uid);
       if (!user) throw new Error("Profil utilisateur introuvable.");
+
+      this.isAdmin = user.admin;
+      this.players = this.users.getPlayersByTeam(user.teamId);
+      this.filteredPlayers = [...this.players];
+      this.selectedPlayer = user.childName;
 
       // MVP simple : on recharge la liste des matchs et on retrouve le match
       const matches = await this.matchesService.getMatchesByTeam(user.teamId);
@@ -147,6 +182,18 @@ export class MatchDetailComponent implements OnInit {
     }
   }
 
+  players: any[] = [];
+  filteredPlayers: any[] = [];
+  selectedPlayer: any = null;
+
+  filterPlayers(event: { query: string }) {
+      const q = (event.query ?? "").toLowerCase();
+
+      this.filteredPlayers = this.players.filter(p =>
+        `${p.Prenom} ${p.Nom}`.toLowerCase().includes(q)
+      );
+  }
+
   back() {
     this.router.navigateByUrl("/matches");
   }
@@ -159,14 +206,20 @@ export class MatchDetailComponent implements OnInit {
     try {
       const uid = this.auth.uid();
       if (!uid) throw new Error("Non connecté");
+      const targetUid = this.isAdmin
+          ? this.selectedPlayer.uid   // admin → joueuse choisie
+          : uid;
+      if (!targetUid) {
+        throw new Error("Aucune joueuse sélectionnée.");
+      }
 
       const user = await this.users.getUser(uid);
       if (!user) throw new Error("Profil utilisateur introuvable.");
 
       const isHome = !!this.match?.isHome;
 
-      await this.responses.saveMyResponse(this.matchId, uid, {
-        childName: user.childName,
+      await this.responses.saveMyResponse(this.matchId, targetUid, {
+        childName: this.selectedPlayer?.fullName ?? this.selectedPlayer,
         status: this.status,
         bringOranges: isHome ? this.bringOranges : false,
         referee: isHome ? this.referee : false,
@@ -184,6 +237,7 @@ export class MatchDetailComponent implements OnInit {
     }
   }
 
+  // Heure de rendez-vous 30min avant le match
   getTimeMinus30(timestamp: number): Date {
     const d = new Date(timestamp);
     d.setMinutes(d.getMinutes() - 30);
