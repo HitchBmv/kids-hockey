@@ -261,12 +261,11 @@ import 'firebase/compat/auth';
           </div>
 
           <button pButton label="Se connecter" (click)="onLogin()" [disabled]="busy"></button>
-          <button pButton label="Continuer en invité" severity="info" (click)="continueAsGuest()"></button>
-
+          
           <p-divider></p-divider>
 
           <div class="text-sm opacity-80">
-            Pour créer votre compte, indiquez:<br>  🏑 email, mot de passe, nom d’équipe, et le nom de l’enfant
+            Sélectionnez une équipe et continuez en tant qu’invité 🕵️            
           </div>
 
           <div class="flex flex-column gap-2">
@@ -279,7 +278,11 @@ import 'firebase/compat/auth';
               placeholder="Sélectionne une équipe"
               [dropdown]="true">
             </p-autoComplete>
+          </div>
+          <button pButton label="Continuer en invité" severity="info" (click)="continueAsGuest()"></button>
 
+          <div class="text-sm opacity-80">          
+            Pour créer votre compte et gérer votre joueuse, indiquez:<br>  🏑 email, mot de passe, nom d’équipe, et le nom de l’enfant
           </div>
 
           <div class="flex flex-column gap-2">
@@ -313,6 +316,7 @@ import 'firebase/compat/auth';
           </div>
 
           <button pButton label="Créer un compte" severity="secondary" (click)="onRegister()" [disabled]="busy"></button>
+          
         </div>
       </p-card>
 
@@ -373,9 +377,9 @@ export class LoginComponent {
     this.filteredPlayers = [...this.players];
   }
   async onDatabaseTeamSelected(teamId: string) {
-      console.log(this.users);
+    console.log(this.users);
 
-      await new Promise((resolve) => {
+    await new Promise((resolve) => {
       const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
         if (user) {
           unsubscribe();
@@ -395,7 +399,7 @@ export class LoginComponent {
     private readonly users: UsersService,
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   async onLogin() {
     this.error = "";
