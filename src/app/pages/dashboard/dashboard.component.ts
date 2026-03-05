@@ -30,7 +30,7 @@ type DashboardRow = {
   standalone: true,
   imports: [CommonModule, FormsModule, TableModule, TagModule, CheckboxModule, SelectModule],
   template: `
-    <h2 class="m-0 mb-3">Dashboard</h2>
+    <h2 class="m-0 mb-3">Dashboard - {{ this.teamId }}</h2>
 
     <p-table
       [value]="rows"
@@ -193,6 +193,7 @@ export class DashboardComponent implements OnInit {
   rows: DashboardRow[] = [];
   loading = true;
   error = "";
+  teamId = "";
 
   constructor(
     private readonly auth: AuthService,
@@ -240,9 +241,19 @@ export class DashboardComponent implements OnInit {
         user = await this.users.getUser(uid);
       }
 
-      if (!user) throw new Error("Profil utilisateur introuvable.");
+      // if (!user) throw new Error("Profil utilisateur introuvable.");
 
-      const matches = await this.matchesService.getMatchesByTeam(user.teamId);
+      // const matches = await this.matchesService.getMatchesByTeam(user.teamId);
+
+      //let teamId: string;
+
+      if (user) {
+        this.teamId = user.teamId;
+      } else {
+        this.teamId = this.auth.getGuestTeam()!;
+      }
+
+      const matches = await this.matchesService.getMatchesByTeam(this.teamId);
 
       const allRows: DashboardRow[] = [];
 

@@ -30,4 +30,14 @@ export class AuthService {
   logout() {
     return signOut(auth);
   }
+
+  private guestTeamId: string | null = null;
+
+  setGuestTeam(teamId: string) {
+    this.guestTeamId = teamId;
+  }
+
+  getGuestTeam(): string | null {
+    return this.guestTeamId;
+  }
 }

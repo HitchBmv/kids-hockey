@@ -261,11 +261,11 @@ import 'firebase/compat/auth';
           </div>
 
           <button pButton label="Se connecter" (click)="onLogin()" [disabled]="busy"></button>
-          
+
           <p-divider></p-divider>
 
           <div class="text-sm opacity-80">
-            Sélectionnez une équipe et continuez en tant qu’invité 🕵️            
+            Sélectionnez une équipe et continuez en tant qu’invité 🕵️
           </div>
 
           <div class="flex flex-column gap-2">
@@ -279,9 +279,9 @@ import 'firebase/compat/auth';
               [dropdown]="true">
             </p-autoComplete>
           </div>
-          <button pButton label="Continuer en invité" severity="info" (click)="continueAsGuest()"></button>
+          <button pButton label="Continuer en invité" severity="info" (click)="continueAsGuest()" [disabled]="!teamId"></button>
 
-          <div class="text-sm opacity-80">          
+          <div class="text-sm opacity-80">
             Pour créer votre compte et gérer votre joueuse, indiquez:<br>  🏑 email, mot de passe, nom d’équipe, et le nom de l’enfant
           </div>
 
@@ -316,7 +316,7 @@ import 'firebase/compat/auth';
           </div>
 
           <button pButton label="Créer un compte" severity="secondary" (click)="onRegister()" [disabled]="busy"></button>
-          
+
         </div>
       </p-card>
 
@@ -416,6 +416,8 @@ export class LoginComponent {
   }
 
   continueAsGuest() {
+    if (!this.teamId) return;
+    this.auth.setGuestTeam(this.teamId);
     this.router.navigateByUrl('/dashboard-public');
   }
 
